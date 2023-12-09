@@ -9,8 +9,8 @@ const feeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    expiredDate: {
-        type: Date,
+    idAssuranceCarrier: {
+        type: String,
         required: true
     },
 });
@@ -19,7 +19,7 @@ feeSchema.methods.cleanup = function() {
     return {
         name: this.name,
         services: this.services,
-        expiredDate: this.expiredDate
+        idAssuranceCarrier: this.idAssuranceCarrier
     }
 }
 

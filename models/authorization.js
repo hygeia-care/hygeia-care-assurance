@@ -21,6 +21,10 @@ const authorizationSchema = new mongoose.Schema({
         type: Boolean,
         required: true
     },
+    idAppointment: {
+        type: String,
+        required: true
+    },
 });
 
 authorizationSchema.methods.cleanup = function() {
@@ -29,7 +33,8 @@ authorizationSchema.methods.cleanup = function() {
         authDate: this.authDate,
         serviceDate: this.serviceDate,
         description: this.description,
-        acceptance: this.acceptance
+        acceptance: this.acceptance,
+        idAppointment: this.idAppointment
     }
 }
 
