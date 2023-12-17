@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Authorization = require('../models/authorization');
+var debug = require('debug')('assurance:server');
 
 /* GET authorizations listing. */
 router.get('/', async function(req, res, next) {

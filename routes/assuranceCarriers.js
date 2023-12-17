@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var AssuranceCarrier = require('../models/assuranceCarrier');
+var debug = require('debug')('assurance:server');
 
 /* GET assurance carriers listing. */
 router.get('/', async function(req, res, next) {
