@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Fee = require('../models/fee');
+var debug = require('debug')('assurance:server');
 
 /* GET fees listing. */
 router.get('/', async function(req, res, next) {
