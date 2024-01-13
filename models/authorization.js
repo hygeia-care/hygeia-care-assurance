@@ -19,7 +19,7 @@ const authorizationSchema = new mongoose.Schema({
     },
     acceptance: {
         type: Boolean,
-        required: true
+        required: false
     },
     idAppointment: {
         type: String,
