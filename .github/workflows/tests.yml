@@ -36,9 +36,9 @@ jobs:
 
     services:
       mongo:
-        image: mongo
+        image: mongo:4.4  # Especificar una versión específica
         options: >-
-          --health-cmd mongo
+          --health-cmd "mongo --eval 'db.runCommand({ connectionStatus: 1 })'"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
