@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Fee = require('../models/fee');
+var AssuranceCarrier = require('../models/assuranceCarrier');
 var debug = require('debug')('assurance:server');
 var verifyJWTToken = require('../verifyJWTToken');
 
@@ -58,6 +59,16 @@ router.post('/', async function(req, res, next) {
   }
 
   const { name, services, idAssuranceCarrier } = req.body;
+
+  try {
+    const result = await AssuranceCarrier.findById(idAssuranceCarrier);
+    if (!result) {
+      return res.status(404).send("Assurance carrier not found");
+    }
+  } catch (e){
+    console.log("DB problem", e);
+    return res.sendStatus(500).send("There was an error retrieving hte assurance carrier");
+  }
 
   const fee = new Fee({
     name,

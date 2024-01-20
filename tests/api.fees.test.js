@@ -2,6 +2,7 @@ const app = require('../app');
 const request = require('supertest');
 const Fee = require('../models/fee');
 const verifyJWTToken = require('../verifyJWTToken');
+const AssuranceCarrier = require('../models/assuranceCarrier');
 
 describe("Fees API", () => {
 
@@ -90,7 +91,12 @@ describe("Fees API", () => {
     });
 
     describe("POST /fees", () => {
-        const fee = new Fee({"name":"TestFee", "services":"Some test services","idAssuranceCarrier":1});
+        const assuranceCarrier = new AssuranceCarrier({"name":"TestAssuranceCarrier", "email":"testassurancecarrier@testassurancecarrier.com", "url": "https://www.testassurancecarrier.com"});
+        dbAssuranceCarrierFindById = jest.spyOn(AssuranceCarrier, "findById");
+        dbAssuranceCarrierFindById.mockImplementation(async () => Promise.resolve(assuranceCarrier));
+
+
+        const fee = new Fee({"name":"TestFee", "services":"Some test services","idAssuranceCarrier":assuranceCarrier._id});
         var dbSave;
 
         beforeEach(() => {
