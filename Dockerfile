@@ -11,7 +11,7 @@ COPY bin/ ./bin
 COPY public ./public
 COPY routes/ ./routes
 COPY models/ ./models
-# COPY services/ ./services
+COPY services/ ./services
 COPY app.js .
 COPY db.js .
 COPY dbTests.js .

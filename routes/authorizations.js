@@ -3,6 +3,7 @@ var router = express.Router();
 var Authorization = require('../models/authorization');
 var debug = require('debug')('assurance:server');
 var verifyJWTToken = require('../verifyJWTToken');
+var appointmentsService = require('../services/appointmentsService');
 
 /* GET authorizations listing. */
 router.get('/', async function(req, res, next) {
@@ -58,6 +59,13 @@ router.post('/', async function(req, res, next) {
   }
 
   const { name, authDate, serviceDate, description, acceptance, idAppointment } = req.body;
+
+  try {
+    await appointmentsService.getAppointment(idAppointment, req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
 
   const authorization = new Authorization({
     name,
@@ -122,6 +130,13 @@ router.put('/:id', async function(req, res, next) {
 
   const authorizationId = req.params.id;
   const updateData = req.body;
+
+  try {
+    await appointmentsService.getAppointment(updateData.idAppointment, req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
 
   try {
     const result = await Authorization.findByIdAndUpdate(authorizationId, updateData, { new: true });

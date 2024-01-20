@@ -2,11 +2,15 @@ const app = require('../app');
 const request = require('supertest');
 const Authorization = require('../models/authorization');
 const verifyJWTToken = require('../verifyJWTToken');
+const appointmentsService = require('../services/appointmentsService');
 
 describe("Authorizations API", () => {
 
     verifyToken = jest.spyOn(verifyJWTToken, "verifyToken");
     verifyToken.mockImplementation(async () => Promise.resolve(true));
+
+    getAppointmentFunc = jest.spyOn(appointmentsService, "getAppointment");
+    getAppointmentFunc.mockImplementation(async () => Promise.resolve(true));
 
     const testJWT = "thisTokenWorks";
 
@@ -90,6 +94,7 @@ describe("Authorizations API", () => {
     });
 
     describe("POST /authorizations", () => {
+        
         const authorization = new Authorization({"name":"TestAuthorization", "authDate":Date.now(), "serviceDate": Date.now(), "description":"Test description","acceptance":true,"idAppointment":1});
         var dbSave;
 
