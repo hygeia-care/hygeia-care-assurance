@@ -1,8 +1,14 @@
 const app = require('../app');
 const request = require('supertest');
 const AssuranceCarrier = require('../models/assuranceCarrier');
+const verifyJWTToken = require('../verifyJWTToken');
 
 describe("Assurance Carriers API", () => {
+
+    verifyToken = jest.spyOn(verifyJWTToken, "verifyToken");
+    verifyToken.mockImplementation(async () => Promise.resolve(true));
+
+    const testJWT = "thisTokenWorks";
 
     describe("GET /assurance_carriers", () => {
         const assuranceCarriers = [
@@ -19,7 +25,9 @@ describe("Assurance Carriers API", () => {
         it("Should return all assurance carriers", () => {
             dbFind.mockImplementation(async () => Promise.resolve(assuranceCarriers));
 
-            return request(app).get("/api/v1/assurance_carriers").then((response) => {
+            return request(app).get("/api/v1/assurance_carriers")
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(200);
                 expect(response.body).toBeArrayOfSize(3);
                 expect(dbFind).toBeCalled();
@@ -29,7 +37,9 @@ describe("Assurance Carriers API", () => {
         it("Should return 500 if there is a problem when retrieving all assurance carriers", () => {
             dbFind.mockImplementation(async () => Promise.reject("Connection failed"));
 
-            return request(app).get("/api/v1/assurance_carriers").then((response) => {
+            return request(app).get("/api/v1/assurance_carriers")
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(500);
                 expect(dbFind).toBeCalled();
             });
@@ -47,7 +57,9 @@ describe("Assurance Carriers API", () => {
         it("Should return assurance carrier given its id", () => {
             dbFindById.mockImplementation(async () => Promise.resolve(assuranceCarrier));
 
-            return request(app).get("/api/v1/assurance_carriers/1").then((response) => {
+            return request(app).get("/api/v1/assurance_carriers/1")
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(200);
                 expect(response.body.name).toEqual("TestAssuranceCarrier");
                 expect(dbFindById).toBeCalled();
@@ -57,7 +69,9 @@ describe("Assurance Carriers API", () => {
         it("Should return 404 if the assurance carrier does not exist", () => {
             dbFindById.mockImplementation(async () => Promise.resolve(null));
 
-            return request(app).get("/api/v1/assurance_carriers/1").then((response) => {
+            return request(app).get("/api/v1/assurance_carriers/1")
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(404);
                 expect(dbFindById).toBeCalled();
             });
@@ -66,7 +80,9 @@ describe("Assurance Carriers API", () => {
         it("Should return 500 if there is a problem when retrieving an assurance carrier", () => {
             dbFindById.mockImplementation(async () => Promise.reject("Connection failed"));
 
-            return request(app).get("/api/v1/assurance_carriers/1").then((response) => {
+            return request(app).get("/api/v1/assurance_carriers/1")
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(500);
                 expect(dbFindById).toBeCalled();
             });
@@ -84,7 +100,10 @@ describe("Assurance Carriers API", () => {
         it("Should add a new assurance carrier if everything is fine", () => {
             dbSave.mockImplementation(async () => Promise.resolve(true));
 
-            return request(app).post("/api/v1/assurance_carriers").send(assuranceCarrier).then((response) => {
+            return request(app).post("/api/v1/assurance_carriers")
+            .set("x-auth-token", testJWT)
+            .send(assuranceCarrier)
+            .then((response) => {
                 expect(response.statusCode).toBe(201);
                 expect(dbSave).toBeCalled();
             });
@@ -93,7 +112,10 @@ describe("Assurance Carriers API", () => {
         it("Should return 500 if there is a problem with the connection", () => {
             dbSave.mockImplementation(async () => Promise.reject("Connection failed"));
 
-            return request(app).post("/api/v1/assurance_carriers").send(assuranceCarrier).then((response) => {
+            return request(app).post("/api/v1/assurance_carriers")
+            .set("x-auth-token", testJWT)
+            .send(assuranceCarrier)
+            .then((response) => {
                 expect(response.statusCode).toBe(500);
                 expect(dbSave).toBeCalled();
             });
@@ -111,7 +133,9 @@ describe("Assurance Carriers API", () => {
         it("Should delete assurance carrier given its id", () => {
             dbDeleteOne.mockImplementation(async () => Promise.resolve({ message: 'Assurance carrier successfully deleted', deletedCount: 1}));
 
-            return request(app).delete("/api/v1/assurance_carriers/"+assuranceCarrier._id).then((response) => {
+            return request(app).delete("/api/v1/assurance_carriers/"+assuranceCarrier._id)
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(200);
                 expect(response.body.message).toEqual("Assurance carrier successfully deleted");
                 expect(dbDeleteOne).toBeCalled();
@@ -121,7 +145,9 @@ describe("Assurance Carriers API", () => {
         it("Should return 404 if the assurance carrier does not exist", () => {
             dbDeleteOne.mockImplementation(async () => Promise.resolve({ message: 'Assurance carrier not found', deletedCount: 0}));
 
-            return request(app).delete("/api/v1/assurance_carriers/"+(assuranceCarrier._id+1)).then((response) => {
+            return request(app).delete("/api/v1/assurance_carriers/"+(assuranceCarrier._id+1))
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(404);
                 expect(response.body.error).toEqual("Assurance carrier not found");
                 expect(dbDeleteOne).toBeCalled();
@@ -131,7 +157,9 @@ describe("Assurance Carriers API", () => {
         it("Should return 500 if there is a problem when deleting an assurance carrier", () => {
             dbDeleteOne.mockImplementation(async () => Promise.reject("Connection failed"));
 
-            return request(app).delete("/api/v1/assurance_carriers/"+assuranceCarrier._id).then((response) => {
+            return request(app).delete("/api/v1/assurance_carriers/"+assuranceCarrier._id)
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(500);
                 expect(dbDeleteOne).toBeCalled();
             });

@@ -2,9 +2,18 @@ var express = require('express');
 var router = express.Router();
 var AssuranceCarrier = require('../models/assuranceCarrier');
 var debug = require('debug')('assurance:server');
+var verifyJWTToken = require('../verifyJWTToken');
 
 /* GET assurance carriers listing. */
 router.get('/', async function(req, res, next) {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+
   try {
     const result = await AssuranceCarrier.find();
     res.send(result.map((c) => c.cleanup()));
@@ -16,6 +25,14 @@ router.get('/', async function(req, res, next) {
 
 /* GET an assurance carrier given and ID. */
 router.get('/:id', async function(req, res, next) {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+
   const assuranceCarrierId = req.params.id;
 
   try {
@@ -32,6 +49,14 @@ router.get('/:id', async function(req, res, next) {
 
 /* POST a new assurance carrier. */
 router.post('/', async function(req, res, next) {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+
   const { name, email, url } = req.body;
 
   const assuranceCarrier = new AssuranceCarrier({
@@ -57,7 +82,15 @@ router.post('/', async function(req, res, next) {
 });
 
 /* DELETE an assurance carrier. */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+
   const assuranceCarrierId = req.params.id;
 
   try {

@@ -15,6 +15,8 @@ COPY models/ ./models
 COPY app.js .
 COPY db.js .
 COPY dbTests.js .
+COPY verifyJWTToken.js .
+COPY .env .
 
 EXPOSE 3338
 

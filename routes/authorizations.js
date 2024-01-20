@@ -2,9 +2,18 @@ var express = require('express');
 var router = express.Router();
 var Authorization = require('../models/authorization');
 var debug = require('debug')('assurance:server');
+var verifyJWTToken = require('../verifyJWTToken');
 
 /* GET authorizations listing. */
 router.get('/', async function(req, res, next) {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+
   try {
     const result = await Authorization.find();
     res.send(result.map((c) => c.cleanup()));
@@ -16,6 +25,14 @@ router.get('/', async function(req, res, next) {
 
 /* GET an authorization given and ID. */
 router.get('/:id', async function(req, res, next) {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+
   const authorizationId = req.params.id;
 
   try {
@@ -32,6 +49,14 @@ router.get('/:id', async function(req, res, next) {
 
 /* POST a new authorization. */
 router.post('/', async function(req, res, next) {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+
   const { name, authDate, serviceDate, description, acceptance, idAppointment } = req.body;
 
   const authorization = new Authorization({
@@ -60,7 +85,15 @@ router.post('/', async function(req, res, next) {
 });
 
 /* DELETE an authorization. */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+  
   const authorizationId = req.params.id;
 
   try {
@@ -79,6 +112,14 @@ router.delete('/:id', async (req, res) => {
 
 /* PUT an authorization. */
 router.put('/:id', async function(req, res, next) {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+
   const authorizationId = req.params.id;
   const updateData = req.body;
 
