@@ -1,8 +1,14 @@
 const app = require('../app');
 const request = require('supertest');
 const Fee = require('../models/fee');
+const verifyJWTToken = require('../verifyJWTToken');
 
 describe("Fees API", () => {
+
+    verifyToken = jest.spyOn(verifyJWTToken, "verifyToken");
+    verifyToken.mockImplementation(async () => Promise.resolve(true));
+
+    const testJWT = "thisTokenWorks";
 
     describe("GET /fees", () => {
         const fees = [
@@ -19,7 +25,9 @@ describe("Fees API", () => {
         it("Should return all fees", () => {
             dbFind.mockImplementation(async () => Promise.resolve(fees));
 
-            return request(app).get("/api/v1/fees").then((response) => {
+            return request(app).get("/api/v1/fees")
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(200);
                 expect(response.body).toBeArrayOfSize(3);
                 expect(dbFind).toBeCalled();
@@ -29,7 +37,9 @@ describe("Fees API", () => {
         it("Should return 500 if there is a problem when retrieving all fees", () => {
             dbFind.mockImplementation(async () => Promise.reject("Connection failed"));
 
-            return request(app).get("/api/v1/fees").then((response) => {
+            return request(app).get("/api/v1/fees")
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(500);
                 expect(dbFind).toBeCalled();
             });
@@ -47,7 +57,9 @@ describe("Fees API", () => {
         it("Should return fee given its id", () => {
             dbFindById.mockImplementation(async () => Promise.resolve(fee));
 
-            return request(app).get("/api/v1/fees/1").then((response) => {
+            return request(app).get("/api/v1/fees/1")
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(200);
                 expect(response.body.name).toEqual("TestFee");
                 expect(dbFindById).toBeCalled();
@@ -57,7 +69,9 @@ describe("Fees API", () => {
         it("Should return 404 if the fee does not exist", () => {
             dbFindById.mockImplementation(async () => Promise.resolve(null));
 
-            return request(app).get("/api/v1/fees/1").then((response) => {
+            return request(app).get("/api/v1/fees/1")
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(404);
                 expect(dbFindById).toBeCalled();
             });
@@ -66,7 +80,9 @@ describe("Fees API", () => {
         it("Should return 500 if there is a problem when retrieving a fee", () => {
             dbFindById.mockImplementation(async () => Promise.reject("Connection failed"));
 
-            return request(app).get("/api/v1/fees/1").then((response) => {
+            return request(app).get("/api/v1/fees/1")
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(500);
                 expect(dbFindById).toBeCalled();
             });
@@ -84,7 +100,10 @@ describe("Fees API", () => {
         it("Should add a new fee if everything is fine", () => {
             dbSave.mockImplementation(async () => Promise.resolve(true));
 
-            return request(app).post("/api/v1/fees").send(fee).then((response) => {
+            return request(app).post("/api/v1/fees")
+            .set("x-auth-token", testJWT)
+            .send(fee)
+            .then((response) => {
                 expect(response.statusCode).toBe(201);
                 expect(dbSave).toBeCalled();
             });
@@ -93,7 +112,10 @@ describe("Fees API", () => {
         it("Should return 500 if there is a problem with the connection", () => {
             dbSave.mockImplementation(async () => Promise.reject("Connection failed"));
 
-            return request(app).post("/api/v1/fees").send(fee).then((response) => {
+            return request(app).post("/api/v1/fees")
+            .set("x-auth-token", testJWT)
+            .send(fee)
+            .then((response) => {
                 expect(response.statusCode).toBe(500);
                 expect(dbSave).toBeCalled();
             });
@@ -101,6 +123,7 @@ describe("Fees API", () => {
     });
 
     describe("DELETE /fees/:id", () => {
+        
         const fee = new Fee({"name":"TestFee", "services":"Some test services","idAssuranceCarrier":1});
         var dbDeleteOne;
 
@@ -111,7 +134,9 @@ describe("Fees API", () => {
         it("Should delete fee given its id", () => {
             dbDeleteOne.mockImplementation(async () => Promise.resolve({ message: 'Fee successfully deleted', deletedCount: 1}));
 
-            return request(app).delete("/api/v1/fees/"+fee._id).then((response) => {
+            return request(app).delete("/api/v1/fees/"+fee._id)
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(200);
                 expect(response.body.message).toEqual("Fee successfully deleted");
                 expect(dbDeleteOne).toBeCalled();
@@ -121,7 +146,9 @@ describe("Fees API", () => {
         it("Should return 404 if the fee does not exist", () => {
             dbDeleteOne.mockImplementation(async () => Promise.resolve({ message: 'Fee not found', deletedCount: 0}));
 
-            return request(app).delete("/api/v1/fees/"+(fee._id+1)).then((response) => {
+            return request(app).delete("/api/v1/fees/"+(fee._id+1))
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(404);
                 expect(response.body.error).toEqual("Fee not found");
                 expect(dbDeleteOne).toBeCalled();
@@ -131,7 +158,9 @@ describe("Fees API", () => {
         it("Should return 500 if there is a problem when retrieving a fee", () => {
             dbDeleteOne.mockImplementation(async () => Promise.reject("Connection failed"));
 
-            return request(app).delete("/api/v1/fees/"+fee._id).then((response) => {
+            return request(app).delete("/api/v1/fees/"+fee._id)
+            .set("x-auth-token", testJWT)
+            .then((response) => {
                 expect(response.statusCode).toBe(500);
                 expect(dbDeleteOne).toBeCalled();
             });

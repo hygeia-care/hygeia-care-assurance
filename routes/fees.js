@@ -2,9 +2,18 @@ var express = require('express');
 var router = express.Router();
 var Fee = require('../models/fee');
 var debug = require('debug')('assurance:server');
+var verifyJWTToken = require('../verifyJWTToken');
 
 /* GET fees listing. */
 router.get('/', async function(req, res, next) {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+
   try {
     const result = await Fee.find();
     res.send(result.map((c) => c.cleanup()));
@@ -16,6 +25,14 @@ router.get('/', async function(req, res, next) {
 
 /* GET a fee given and ID. */
 router.get('/:id', async function(req, res, next) {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+
   const feeId = req.params.id;
 
   try {
@@ -32,6 +49,14 @@ router.get('/:id', async function(req, res, next) {
 
 /* POST a new fee. */
 router.post('/', async function(req, res, next) {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+
   const { name, services, idAssuranceCarrier } = req.body;
 
   const fee = new Fee({
@@ -57,7 +82,15 @@ router.post('/', async function(req, res, next) {
 });
 
 /* DELETE a fee. */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
+
+  try {
+    await verifyJWTToken.verifyToken(req, res, next);
+  } catch (e){
+    console.error(e);
+    return true;
+  }
+
   const feeId = req.params.id;
 
   try {
